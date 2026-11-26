@@ -1,0 +1,920 @@
+<title>Social Delas · Protótipo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@500;600;700;800&family=Nunito:wght@400;600;700&display=swap">
+<style>
+/* Layout: brand = sunset pink + script "Social" + spaced caps "DELAS". Hero split (lockup | poster), marquee, about, ticket stubs on sunset, schedule, quote band, local+FAQ, CTA, footer. Single committed light look. */
+:root{
+  color-scheme:light;
+  --pink:#E8177D; --pink-deep:#B30F5E; --pink-soft:#FFD3E6; --blush:#FFF2F7; --peach:#FFB48A; --sun:#FF8757;
+  --ink:#2A0F1E; --muted:#86566D; --line:#F5CFE0; --card:#FFFFFF; --white:#FFFFFF;
+  --ok:#14804A; --ok-bg:#DCF5E7; --warn:#A15C07; --warn-bg:#FFEFD2; --bad:#C2185B; --bad-bg:#FFE0EC;
+  --qr-bg:#FFFFFF; --qr-fg:#2A0F1E;
+  --sunset:linear-gradient(170deg,#F7A6CF 0%,#FBB3C9 38%,#FFC3A0 72%,#FF9F70 100%);
+  --pinkgrad:linear-gradient(120deg,#E8177D 0%,#F0447F 45%,#FF8757 100%);
+  --f-script:"Great Vibes", "Brush Script MT", cursive;
+  --f-head:"Montserrat", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Nunito", "Segoe UI", system-ui, sans-serif;
+  --f-mono:ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --shadow:0 24px 60px -28px rgba(179,15,94,.45);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{background:var(--blush);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.6}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--pink-deep)}
+h1,h2,h3,h4{font-family:var(--f-head);line-height:1.1;margin:0;text-wrap:balance;font-weight:800}
+p{margin:0}
+a{color:inherit}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+img{display:block}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.script{font-family:var(--f-script);font-weight:400;letter-spacing:0}
+.caps{font-family:var(--f-head);text-transform:uppercase;letter-spacing:.32em;font-weight:600}
+.eyebrow{font-family:var(--f-head);font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;font-weight:700;color:var(--pink)}
+.num{font-variant-numeric:tabular-nums}
+.mono{font-family:var(--f-mono)}
+.hint{font-size:.85rem;color:var(--muted)}
+
+/* demo bar */
+.demobar{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:var(--pink-deep);color:var(--white)}
+.demobar .wrap{display:flex;align-items:center;gap:10px;padding-block:7px;flex-wrap:wrap}
+.demobar .tag{font-family:var(--f-head);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;opacity:.85;flex:1 1 220px;min-width:0;font-weight:600}
+.demobar nav{display:flex;gap:4px;flex-wrap:wrap}
+.demobar nav button{background:transparent;border:1px solid transparent;color:var(--white);padding:5px 12px;border-radius:99px;cursor:pointer;font-size:.8rem;font-weight:700;font-family:var(--f-head)}
+.demobar nav button[aria-current="true"]{background:var(--white);color:var(--pink-deep)}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:99px;padding:14px 26px;font-family:var(--f-head);font-weight:700;font-size:.92rem;letter-spacing:.02em;cursor:pointer;text-decoration:none;transition:transform .2s,box-shadow .2s}
+.btn:hover{transform:translateY(-2px)}
+.btn-primary{background:var(--pinkgrad);color:var(--white);box-shadow:0 12px 28px -12px rgba(232,23,125,.8)}
+.btn-white{background:var(--white);color:var(--pink-deep)}
+.btn-ghost{background:rgba(255,255,255,.7);border:1.5px solid var(--line);color:var(--ink)}
+.btn-outline-w{background:transparent;border:1.5px solid rgba(255,255,255,.8);color:var(--white)}
+.btn-sm{padding:9px 16px;font-size:.82rem}
+.btn[disabled]{opacity:.5;cursor:not-allowed;transform:none}
+
+/* site header */
+.sitehead{position:absolute;left:0;right:0;z-index:5}
+.sitehead .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:14px}
+.sitehead .brand img{height:78px;width:auto}
+.navpill{display:flex;gap:4px;align-items:center;background:rgba(255,255,255,.55);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);padding:5px 5px 5px 18px;border-radius:99px;border:1px solid rgba(255,255,255,.7)}
+.navpill a.lk{text-decoration:none;font-family:var(--f-head);font-weight:600;font-size:.85rem;padding:6px 10px}
+@media (max-width:820px){.navpill a.hide-m{display:none}.sitehead .brand img{height:46px}}
+.sitehead.solid{position:relative;background:var(--white);border-bottom:1px solid var(--line)}
+.sitehead.solid .navpill{background:var(--blush)}
+
+/* hero */
+.hero{position:relative;overflow:hidden;background:var(--sunset);isolation:isolate}
+.hero::before{content:"";position:absolute;inset:-60px;background:url("assets/banner.webp") center 70%/cover;filter:blur(34px) saturate(1.15);opacity:.55;z-index:-2;transform:scale(1.1)}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,236,244,.86) 0%,rgba(255,226,238,.55) 48%,rgba(255,220,230,0) 75%);z-index:-1}
+.hero .wrap{display:grid;grid-template-columns:1.15fr .85fr;gap:48px;align-items:center;padding-block:120px 80px}
+@media (max-width:900px){.hero .wrap{grid-template-columns:1fr;gap:40px;padding-block:96px 56px}.hero::after{background:linear-gradient(180deg,rgba(255,236,244,.85),rgba(255,226,238,.55))}}
+.kicker{display:inline-flex;gap:10px;align-items:center;background:var(--white);border-radius:99px;padding:7px 16px 7px 8px;font-family:var(--f-head);font-weight:700;font-size:.8rem;box-shadow:0 8px 24px -14px rgba(179,15,94,.6)}
+.kicker b{background:var(--pinkgrad);color:var(--white);border-radius:99px;padding:3px 10px;font-size:.72rem;letter-spacing:.06em}
+.lockup{margin-top:20px;display:grid;justify-items:start}
+.lockup .s{font-family:var(--f-script);font-size:clamp(5.4rem,13vw,10.5rem);line-height:.85;color:var(--ink);margin-left:-.04em}
+.lockup .d{display:flex;align-items:center;gap:16px;margin-top:6px;color:var(--pink);font-family:var(--f-head);font-weight:600;font-size:clamp(1.4rem,3.2vw,2.3rem);letter-spacing:.42em;padding-left:.2em}
+.lockup .d::before,.lockup .d::after{content:"";width:44px;height:3px;background:var(--pink);border-radius:3px}
+.lockup .t{font-family:var(--f-script);color:var(--pink);font-size:clamp(1.9rem,4vw,2.9rem);line-height:1.1;margin-top:4px}
+.hero .lede{max-width:44ch;margin-top:20px;font-size:1.08rem;color:#4A1F33}
+.hero .ctas{display:flex;gap:12px;flex-wrap:wrap;margin-top:26px}
+.facts{display:flex;flex-wrap:wrap;gap:10px 22px;margin-top:28px;font-family:var(--f-head);font-weight:600;font-size:.88rem}
+.facts span{display:inline-flex;align-items:center;gap:8px}
+.facts svg{color:var(--pink)}
+.posterwrap{position:relative;justify-self:center;width:min(380px,100%)}
+.poster{border-radius:30px;overflow:hidden;box-shadow:0 40px 80px -30px rgba(120,10,60,.55);transform:rotate(3deg);border:6px solid var(--white);aspect-ratio:9/14;max-width:100%}
+.poster img{width:100%;height:100%;object-fit:cover;object-position:center 30%}
+.glass{background:rgba(255,255,255,.82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.9);border-radius:22px;box-shadow:var(--shadow)}
+.cdcard{position:absolute;left:-44px;bottom:36px;padding:14px 16px;display:grid;gap:8px;transform:rotate(-3deg)}
+@media (max-width:520px){.cdcard{left:-6px;bottom:-24px}}
+.countdown{display:grid;grid-template-columns:repeat(4,auto);gap:12px}
+.countdown div{text-align:center}
+.countdown b{display:block;font-family:var(--f-head);font-size:1.7rem;font-weight:800;line-height:1;color:var(--pink-deep);font-variant-numeric:tabular-nums}
+.countdown small{font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-family:var(--f-head);font-weight:600}
+.offbadge{position:absolute;right:-18px;top:28px;width:112px;height:112px;border-radius:50%;background:var(--pinkgrad);color:var(--white);display:grid;place-items:center;text-align:center;transform:rotate(10deg);box-shadow:0 18px 40px -16px rgba(232,23,125,.9);font-family:var(--f-head);font-weight:800;line-height:1}
+.offbadge span{display:block;font-size:1.9rem}
+.offbadge small{display:block;font-size:.62rem;letter-spacing:.14em;margin-top:4px}
+@media (max-width:520px){.offbadge{right:-4px;width:92px;height:92px}.offbadge span{font-size:1.5rem}}
+.heart{position:absolute;color:var(--pink);opacity:.85;animation:float 6s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-12px) rotate(6deg)}}
+@media (prefers-reduced-motion:reduce){.heart{animation:none}}
+
+/* marquee */
+.marquee{background:var(--pinkgrad);color:var(--white);overflow:hidden;white-space:nowrap;padding-block:12px}
+.marquee .track{display:inline-flex;align-items:center;gap:34px;animation:mq 34s linear infinite}
+.marquee .track span{font-family:var(--f-head);font-weight:700;text-transform:uppercase;letter-spacing:.24em;font-size:.9rem}
+.marquee .track em{font-family:var(--f-script);font-style:normal;font-size:2rem;line-height:1}
+@keyframes mq{to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){.marquee .track{animation:none}}
+
+/* sections */
+.section{padding-block:88px}
+.shead{display:grid;gap:10px;justify-items:center;text-align:center;margin-bottom:44px}
+.shead h2{font-size:clamp(2rem,4.4vw,3.1rem);letter-spacing:-.02em}
+.shead h2 .script{color:var(--pink);font-size:1.35em;line-height:.6;display:inline-block;transform:translateY(.08em)}
+.shead p{max-width:52ch;color:var(--muted)}
+
+.about{display:grid;grid-template-columns:.9fr 1.1fr;gap:56px;align-items:center}
+@media (max-width:900px){.about{grid-template-columns:1fr;gap:36px}}
+.about .pic{position:relative}
+.about .pic img{width:100%;height:auto;border-radius:28px;box-shadow:var(--shadow);aspect-ratio:1;object-fit:cover;max-width:100%}
+.about .pic .note{position:absolute;right:-14px;bottom:-22px;padding:14px 18px;max-width:230px}
+.about .pic .note b{font-family:var(--f-script);font-size:2rem;color:var(--pink);line-height:1;display:block;font-weight:400}
+@media (max-width:520px){.about .pic .note{right:8px}}
+.about h2{font-size:clamp(2rem,4.2vw,3rem);letter-spacing:-.02em}
+.about h2 .script{color:var(--pink);font-size:1.4em;line-height:.5;font-weight:400}
+.about .body{display:grid;gap:18px}
+.about .body>p{color:var(--muted);font-size:1.05rem;max-width:54ch}
+.pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:8px}
+@media (max-width:640px){.pillars{grid-template-columns:1fr}}
+.pillar{background:var(--white);border-radius:20px;padding:18px;display:grid;gap:8px;border:1px solid var(--line)}
+.pillar .ic{width:42px;height:42px;border-radius:14px;background:var(--pink-soft);color:var(--pink);display:grid;place-items:center}
+.pillar b{font-family:var(--f-head);font-size:.95rem}
+.pillar p{color:var(--muted);font-size:.88rem;line-height:1.5}
+
+/* tickets */
+.tix-sec{background:var(--sunset);position:relative;overflow:hidden}
+.tix-sec .shead h2{color:var(--ink)}
+.tix-sec .shead p{color:#5A2840}
+.tickets{display:grid;gap:22px;max-width:960px;margin:0 auto}
+.ticket{display:grid;grid-template-columns:1fr 270px;filter:drop-shadow(0 22px 34px rgba(150,20,80,.28));
+  -webkit-mask:radial-gradient(circle 16px at calc(100% - 270px) 0,#0000 98%,#000) top/100% 51% no-repeat,radial-gradient(circle 16px at calc(100% - 270px) 100%,#0000 98%,#000) bottom/100% 51% no-repeat;
+  mask:radial-gradient(circle 16px at calc(100% - 270px) 0,#0000 98%,#000) top/100% 51% no-repeat,radial-gradient(circle 16px at calc(100% - 270px) 100%,#0000 98%,#000) bottom/100% 51% no-repeat}
+.ticket .art{position:relative;min-height:190px;padding:24px 28px;color:var(--white);display:flex;flex-direction:column;justify-content:space-between;gap:14px;border-radius:22px 0 0 22px;overflow:hidden;
+  background:linear-gradient(100deg,rgba(184,15,94,.88) 0%,rgba(232,23,125,.55) 50%,rgba(255,135,87,.25) 100%),url("assets/banner.webp") center 78%/cover}
+.ticket .art .s{font-family:var(--f-script);font-size:3.4rem;line-height:.8;text-shadow:0 2px 14px rgba(90,0,40,.35)}
+.ticket .art .d{font-family:var(--f-head);font-weight:600;letter-spacing:.4em;font-size:.8rem}
+.ticket .art h3{font-size:1.5rem;letter-spacing:.02em;text-transform:uppercase}
+.ticket .art p{font-size:.92rem;opacity:.95;max-width:40ch}
+.ticket .stub{background:#FFF7FA;border-radius:0 22px 22px 0;padding:22px 24px 22px 28px;display:flex;flex-direction:column;justify-content:center;gap:10px;border-left:3px dotted #F4B9D1;position:relative}
+.barcode{height:34px;border-radius:3px;background:repeating-linear-gradient(90deg,var(--ink) 0 2px,transparent 2px 4px,var(--ink) 4px 5px,transparent 5px 8px,var(--ink) 8px 11px,transparent 11px 12px,var(--ink) 12px 13px,transparent 13px 16px);opacity:.85}
+.price{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.price s{color:var(--muted);font-size:.92rem}
+.price b{font-family:var(--f-head);font-size:2.1rem;font-weight:800;letter-spacing:-.02em}
+.ticket.off .art{filter:grayscale(.75) brightness(.95)}
+.ticket.off .stub{opacity:.75}
+.stamp{position:absolute;right:22px;top:50%;transform:translateY(-50%) rotate(-12deg);border:3px solid var(--white);color:var(--white);font-family:var(--f-head);font-weight:800;letter-spacing:.2em;padding:6px 14px;border-radius:8px;font-size:1.1rem}
+@media (max-width:700px){
+  .ticket{grid-template-columns:1fr;-webkit-mask:none;mask:none}
+  .ticket .art{border-radius:22px 22px 0 0}
+  .ticket .stub{border-radius:0 0 22px 22px;border-left:0;border-top:3px dotted #F4B9D1}
+}
+.chip{display:inline-flex;align-items:center;gap:6px;font-family:var(--f-head);font-size:.7rem;font-weight:700;letter-spacing:.04em;padding:4px 10px;border-radius:99px;white-space:nowrap;width:max-content}
+.chip::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.chip.ok{background:var(--ok-bg);color:var(--ok)}
+.chip.warn{background:var(--warn-bg);color:var(--warn)}
+.chip.bad{background:var(--bad-bg);color:var(--bad)}
+.chip.mute{background:#F3E6EC;color:var(--muted)}
+.payicons{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:30px}
+.payicons span{background:rgba(255,255,255,.75);border-radius:99px;padding:7px 14px;font-family:var(--f-head);font-weight:700;font-size:.78rem;color:var(--pink-deep)}
+
+/* schedule */
+.sched{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+@media (max-width:900px){.sched{grid-template-columns:1fr 1fr}}
+@media (max-width:480px){.sched{grid-template-columns:1fr}}
+.slot{background:var(--white);border-radius:24px;padding:22px;display:grid;gap:8px;border:1px solid var(--line);position:relative;overflow:hidden}
+.slot time{font-family:var(--f-head);font-weight:800;font-size:1.9rem;color:var(--pink);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.slot b{font-family:var(--f-head);font-size:1rem}
+.slot p{color:var(--muted);font-size:.9rem}
+.slot.hl{background:var(--pinkgrad);color:var(--white);border:0}
+.slot.hl time,.slot.hl p{color:var(--white)}
+
+/* quote band */
+.quote{background:var(--pink-deep);color:var(--white);text-align:center;position:relative;overflow:hidden}
+.quote .wrap{padding-block:80px;display:grid;gap:10px;justify-items:center}
+.quote .script{font-size:clamp(3rem,8vw,6rem);line-height:1}
+.quote p.caps{font-size:.82rem;opacity:.85}
+
+/* local + faq */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:48px}
+@media (max-width:900px){.split{grid-template-columns:1fr}}
+.split h2{font-size:clamp(1.8rem,3.6vw,2.4rem);margin-bottom:18px}
+.split h2 .script{color:var(--pink);font-size:1.4em;font-weight:400}
+.mapbox{border-radius:28px;background:var(--pink-soft);aspect-ratio:4/3;max-width:100%;position:relative;overflow:hidden;display:grid;place-items:center;padding:24px}
+.mapbox svg.map{position:absolute;inset:0;width:100%;height:100%}
+.mapbox .pin{position:relative;display:grid;gap:4px;justify-items:center;text-align:center;padding:18px 22px;max-width:290px}
+.mapbox .pin .dotpin{width:44px;height:44px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--pinkgrad);margin-bottom:8px;box-shadow:0 10px 20px -8px rgba(232,23,125,.8)}
+details{background:var(--white);border-radius:18px;padding:16px 20px;border:1px solid var(--line)}
+details+details{margin-top:10px}
+summary{cursor:pointer;font-family:var(--f-head);font-weight:700;font-size:.95rem;list-style:none;display:flex;justify-content:space-between;gap:12px;align-items:center}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";flex:none;width:28px;height:28px;border-radius:50%;background:var(--pink-soft);color:var(--pink);display:grid;place-items:center;font-size:1.2rem;line-height:1}
+details[open] summary::after{content:"–"}
+details p{color:var(--muted);margin-top:10px;max-width:60ch}
+
+/* final CTA + footer */
+.cta{background:var(--sunset);text-align:center}
+.cta .wrap{padding-block:80px;display:grid;gap:16px;justify-items:center}
+.cta h2{font-size:clamp(2rem,4.6vw,3.2rem)}
+.cta h2 .script{color:var(--pink-deep);font-weight:400;font-size:1.35em}
+footer.sitefoot{background:var(--white);border-top:1px solid var(--line)}
+footer.sitefoot .wrap{padding-block:36px;display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;align-items:center}
+footer.sitefoot img{height:86px;width:auto}
+.socials{display:flex;gap:10px}
+.socials span{width:42px;height:42px;border-radius:50%;background:var(--pink-soft);color:var(--pink);display:grid;place-items:center}
+
+/* forms */
+.field{display:grid;gap:6px}
+.field label{font-family:var(--f-head);font-size:.76rem;font-weight:700;letter-spacing:.04em}
+.field input,.field select{border:1.5px solid var(--line);background:var(--white);border-radius:14px;padding:12px 14px;width:100%;min-width:0}
+.field input:focus,.field select:focus{border-color:var(--pink);outline:none;box-shadow:0 0 0 4px rgba(232,23,125,.12)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:520px){.grid2{grid-template-columns:1fr}}
+
+/* auth */
+.authwrap{min-height:calc(100vh - 44px);display:grid;grid-template-columns:1fr 1fr}
+@media (max-width:900px){.authwrap{grid-template-columns:1fr}.authwrap .art{min-height:260px}}
+.authwrap .art{position:relative;background:url("assets/banner.webp") center 35%/cover;display:flex;align-items:flex-end;padding:40px}
+.authwrap .art::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(232,23,125,0) 40%,rgba(150,10,70,.78) 100%)}
+.authwrap .art div{position:relative;z-index:1;color:var(--white);display:grid;gap:6px}
+.authwrap .art .script{font-size:clamp(2.6rem,5vw,3.8rem);line-height:1}
+.authform{display:grid;align-content:center;padding-block:48px;background:var(--white)}
+.authform .box{max-width:410px;width:100%;margin:0 auto;display:grid;gap:16px}
+.authform h1{font-size:1.9rem}
+.authform h1 .script{color:var(--pink);font-weight:400;font-size:1.4em}
+.tabs{display:flex;background:var(--blush);border-radius:99px;padding:4px;border:1px solid var(--line)}
+.tabs button{flex:1;border:0;background:transparent;padding:10px;border-radius:99px;font-family:var(--f-head);font-weight:700;font-size:.85rem;cursor:pointer;color:var(--muted)}
+.tabs button[aria-selected="true"]{background:var(--pinkgrad);color:var(--white)}
+.or{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:.82rem}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
+
+/* conta */
+.acct{background:var(--blush);min-height:70vh}
+.acct-head{padding-block:40px 28px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:end}
+.acct-head h1{font-size:clamp(2rem,5vw,3rem)}
+.acct-head h1 .script{color:var(--pink);font-weight:400;font-size:1.4em}
+.mytickets{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:22px;padding-bottom:64px}
+.mt{background:var(--white);border-radius:26px;overflow:hidden;display:grid;box-shadow:var(--shadow)}
+.mt .top{background:linear-gradient(180deg,rgba(184,15,94,.15),rgba(184,15,94,.75)),url("assets/banner.webp") center 80%/cover;color:var(--white);padding:18px 20px;display:flex;justify-content:space-between;gap:12px;align-items:end;min-height:120px}
+.mt .top .s{font-family:var(--f-script);font-size:2.6rem;line-height:.8}
+.mt .top .d{font-family:var(--f-head);font-weight:600;letter-spacing:.4em;font-size:.7rem}
+.mt .qrz{display:grid;place-items:center;padding:22px;border-bottom:3px dotted var(--line);position:relative}
+.qr{background:var(--qr-bg);padding:8px;border-radius:12px;width:168px;height:168px;max-width:100%;border:1px solid var(--line)}
+.qr svg{display:block;width:100%;height:100%}
+.mt .meta{padding:16px 20px;display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;font-size:.9rem}
+.mt .meta span.k{display:block;font-family:var(--f-head);font-size:.64rem;color:var(--muted);text-transform:uppercase;letter-spacing:.14em;font-weight:700}
+.mt .actions{display:flex;gap:8px;padding:0 20px 20px;flex-wrap:wrap}
+.empty{background:var(--white);border:2px dashed var(--line);border-radius:26px;padding:44px;text-align:center;display:grid;gap:12px;justify-items:center;color:var(--muted)}
+
+/* admin */
+.admin{display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 44px);background:#FBF5F8}
+.side-nav{background:var(--white);border-right:1px solid var(--line);padding:20px 14px;display:flex;flex-direction:column;gap:4px}
+.side-nav img{width:150px;height:auto;margin:0 auto 16px}
+.side-nav button{display:flex;align-items:center;gap:10px;border:0;background:transparent;padding:11px 14px;border-radius:14px;cursor:pointer;font-family:var(--f-head);font-weight:600;font-size:.86rem;text-align:left;color:var(--muted)}
+.side-nav button svg{flex:none}
+.side-nav button:hover{background:var(--blush)}
+.side-nav button[aria-current="true"]{background:var(--pinkgrad);color:var(--white)}
+.side-nav .sp{flex:1}
+.admin-main{padding-block:30px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));min-width:0}
+@media (min-width:901px){.admin-main{padding-left:36px;padding-right:max(36px,env(safe-area-inset-right,0px))}}
+@media (max-width:900px){.admin{grid-template-columns:1fr}.side-nav{flex-direction:row;overflow-x:auto;border-right:0;border-bottom:1px solid var(--line);padding:8px max(16px,env(safe-area-inset-right,0px)) 8px max(16px,env(safe-area-inset-left,0px))}.side-nav img,.side-nav .sp{display:none}.side-nav button{white-space:nowrap}}
+.admin-top{display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap;margin-bottom:24px}
+.admin-top h1{font-size:1.9rem}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px}
+@media (max-width:1050px){.kpis{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:420px){.kpis{grid-template-columns:1fr}}
+.kpi{background:var(--white);border:1px solid var(--line);border-radius:20px;padding:18px;display:grid;gap:4px;min-width:0}
+.kpi.hl{background:var(--pinkgrad);color:var(--white);border:0}
+.kpi.hl .eyebrow,.kpi.hl small{color:rgba(255,255,255,.9)}
+.kpi b{font-family:var(--f-head);font-size:1.75rem;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.02em;line-height:1.15}
+.kpi small{color:var(--muted);font-size:.82rem}
+.panel{background:var(--white);border:1px solid var(--line);border-radius:20px;padding:20px;min-width:0}
+.panel h3{font-size:1rem;margin-bottom:2px}
+.panel .sub{color:var(--muted);font-size:.84rem;margin-bottom:14px}
+.cols{display:grid;grid-template-columns:1.6fr 1fr;gap:14px}
+@media (max-width:1050px){.cols{grid-template-columns:1fr}}
+.chartwrap{position:relative;overflow-x:auto}
+.chartwrap svg{display:block;width:100%;min-width:480px;height:auto}
+.chartwrap text{fill:var(--muted);font-family:var(--f-body);font-size:11px}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--white);padding:8px 10px;border-radius:10px;font-size:.8rem;white-space:nowrap;transform:translate(-50%,-112%)}
+.meter{display:grid;gap:6px;padding-block:12px;border-bottom:1px solid var(--line)}
+.meter:last-child{border-bottom:0}
+.meter .row{display:flex;justify-content:space-between;gap:8px;font-size:.9rem;align-items:center}
+.meter .row b{font-family:var(--f-head);font-size:.88rem}
+.bar{height:9px;border-radius:9px;background:var(--blush);overflow:hidden;border:1px solid var(--line)}
+.bar i{display:block;height:100%;background:var(--pinkgrad);border-radius:9px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.toolbar input{border:1.5px solid var(--line);background:var(--white);border-radius:99px;padding:10px 18px;flex:1 1 220px;min-width:0}
+.fchips{display:flex;gap:6px;flex-wrap:wrap}
+.fchips button{border:1.5px solid var(--line);background:var(--white);padding:7px 14px;border-radius:99px;cursor:pointer;font-family:var(--f-head);font-size:.78rem;font-weight:600}
+.fchips button[aria-pressed="true"]{background:var(--pink);color:var(--white);border-color:var(--pink)}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:20px;background:var(--white)}
+table{border-collapse:collapse;width:100%;min-width:780px;font-size:.88rem}
+th{text-align:left;font-family:var(--f-head);font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700;padding:13px 14px;border-bottom:1px solid var(--line);background:var(--blush)}
+td{padding:12px 14px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+tr:last-child td{border-bottom:0}
+td.r,th.r{text-align:right}
+.lotes-admin{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.lote-card{display:grid;gap:12px}
+.lote-card header{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.switch{position:relative;width:46px;height:27px;flex:none}
+.switch input{opacity:0;width:100%;height:100%;margin:0;cursor:pointer;position:relative;z-index:1}
+.switch span{position:absolute;inset:0;background:#E9D3DD;border-radius:99px;transition:.2s}
+.switch span::after{content:"";position:absolute;top:3px;left:3px;width:21px;height:21px;border-radius:50%;background:var(--white);transition:.2s;box-shadow:0 2px 4px rgba(0,0,0,.15)}
+.switch input:checked+span{background:var(--pink)}
+.switch input:checked+span::after{transform:translateX(19px)}
+.switch input:focus-visible+span{outline:3px solid var(--sun);outline-offset:2px}
+.scan{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:900px){.scan{grid-template-columns:1fr}}
+.viewfinder{aspect-ratio:1;max-width:100%;max-height:320px;width:100%;margin:0 auto;border-radius:24px;background:#2A0F1E;position:relative;display:grid;place-items:center;color:var(--white);overflow:hidden}
+.viewfinder::before{content:"";position:absolute;inset:18%;border:3px solid var(--pink);border-radius:18px}
+.viewfinder .laser{position:absolute;left:18%;right:18%;height:2px;background:var(--peach);top:50%;box-shadow:0 0 14px var(--pink);animation:laser 2.2s ease-in-out infinite alternate}
+@keyframes laser{from{top:22%}to{top:78%}}
+@media (prefers-reduced-motion:reduce){.viewfinder .laser{animation:none}}
+.result{border-radius:20px;padding:20px;display:grid;gap:4px}
+.result.ok{background:var(--ok-bg);color:var(--ok)}
+.result.bad{background:var(--bad-bg);color:var(--bad)}
+.result.idle{background:var(--white);border:1px solid var(--line);color:var(--muted)}
+.result b{font-family:var(--f-head);font-size:1.5rem;font-weight:800}
+.result .who{color:var(--ink);font-weight:700}
+
+/* modal */
+.overlay{position:fixed;inset:0;z-index:70;background:rgba(60,8,34,.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:grid;place-items:center;padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.modal{background:var(--white);border-radius:28px;width:min(560px,100%);max-height:calc(100vh - 32px);overflow:auto;display:grid;box-shadow:0 40px 90px -30px rgba(60,8,34,.6)}
+.modal header{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:20px 24px 14px;position:sticky;top:0;background:var(--white);z-index:1}
+.modal header h3{font-size:1.2rem}
+.modal header h3 .script{color:var(--pink);font-weight:400;font-size:1.5em}
+.x{border:0;background:var(--blush);width:38px;height:38px;border-radius:50%;cursor:pointer;font-size:1rem;color:var(--pink-deep)}
+.steps{display:flex;gap:6px;padding:0 24px}
+.steps i{flex:1;height:5px;border-radius:9px;background:var(--blush)}
+.steps i.on{background:var(--pinkgrad)}
+.mbody{padding:20px 24px;display:grid;gap:16px}
+.mfoot{padding:16px 24px 24px;display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;border-top:1px solid var(--line);background:var(--blush)}
+.mfoot .tot{display:grid}
+.mfoot .tot b{font-family:var(--f-head);font-size:1.6rem;font-weight:800;font-variant-numeric:tabular-nums}
+.minitix{display:flex;gap:14px;align-items:center;background:var(--blush);border-radius:18px;padding:12px;border:1px solid var(--line)}
+.side-nav img{height:auto}
+.authform img{height:auto}
+footer.sitefoot img{width:auto}
+.minitix img{width:76px;height:76px;border-radius:12px;object-fit:cover;flex:none}
+.minitix b{font-family:var(--f-head)}
+.qty{display:flex;align-items:center;border:1.5px solid var(--line);border-radius:99px;width:max-content;background:var(--white)}
+.qty button{border:0;background:transparent;width:42px;height:42px;font-size:1.3rem;cursor:pointer;border-radius:50%;color:var(--pink)}
+.qty output{min-width:32px;text-align:center;font-family:var(--f-head);font-weight:800;font-variant-numeric:tabular-nums}
+.line{display:flex;justify-content:space-between;gap:12px;font-size:.95rem}
+.line.muted{color:var(--muted)}
+.paytabs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.paytabs button{border:1.5px solid var(--line);background:var(--white);border-radius:18px;padding:14px;cursor:pointer;text-align:left;display:grid;gap:2px}
+.paytabs button b{font-family:var(--f-head);font-size:.95rem}
+.paytabs button small{color:var(--muted)}
+.paytabs button[aria-pressed="true"]{border-color:var(--pink);box-shadow:inset 0 0 0 1px var(--pink);background:var(--blush)}
+.pixbox{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center;background:var(--blush);border:1px solid var(--line);border-radius:20px;padding:16px}
+@media (max-width:480px){.pixbox{grid-template-columns:1fr;justify-items:center;text-align:center}}
+.pixbox .qr{width:150px;height:150px}
+.copyline{display:flex;gap:8px;min-width:0}
+.copyline input{flex:1;min-width:0;border:1.5px solid var(--line);border-radius:14px;padding:9px 12px;background:var(--white)}
+.copyline input.mono{font-size:.76rem}
+.waiting{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:.88rem}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--sun);animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.3}}
+.demo-note{font-size:.82rem;color:var(--muted);background:var(--blush);border:1px dashed #EDB3CC;border-radius:14px;padding:10px 14px}
+.success{text-align:center;display:grid;gap:10px;justify-items:center}
+.success .script{font-size:3.2rem;color:var(--pink);line-height:1}
+
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--white);padding:12px 20px;border-radius:99px;z-index:90;font-weight:600;max-width:calc(100% - 32px);box-shadow:0 10px 30px -10px rgba(0,0,0,.4);font-size:.9rem}
+</style>
+
+<div class="demobar">
+  <div class="wrap">
+    <div class="tag">Protótipo de apresentação · dados ilustrativos</div>
+    <nav aria-label="Telas do protótipo">
+      <button data-go="inicio">Site</button>
+      <button data-go="entrar">Login</button>
+      <button data-go="conta">Minha conta</button>
+      <button data-go="admin">Painel admin</button>
+    </nav>
+  </div>
+</div>
+
+<main id="app"></main>
+<div id="modal-root"></div>
+<div id="toast-root"></div>
+
+<script>
+(function(){
+"use strict";
+const $ = (s, el=document) => el.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const brl = n => n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const pad = n => String(n).padStart(2,'0');
+const dShort = d => pad(d.getDate())+'/'+pad(d.getMonth()+1);
+const dTime = d => dShort(d)+' '+pad(d.getHours())+':'+pad(d.getMinutes());
+function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function hash(s){let h=2166136261;for(const c of s){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
+
+const sv=(p,w=20)=>`<svg width="${w}" height="${w}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+const ICON = {
+  home:sv('<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',18),
+  list:sv('<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',18),
+  ticket:sv('<path d="M3 8a2 2 0 0 0 0 4 2 2 0 0 1 0 4v2h18v-2a2 2 0 0 1 0-4 2 2 0 0 0 0-4V6H3z"/>',18),
+  scan:sv('<path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M7 12h10"/>',18),
+  tag:sv('<path d="M20 12l-8 8-9-9V3h8z"/><circle cx="7.5" cy="7.5" r="1.5"/>',18),
+  gear:sv('<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/>',18),
+  out:sv('<path d="M15 4h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4M10 17l5-5-5-5M15 12H3"/>',18),
+  music:sv('<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>'),
+  heart:sv('<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8z"/>'),
+  glass:sv('<path d="M8 22h8M12 15v7M5 3h14l-1 6a6 6 0 0 1-12 0z"/>'),
+  cam:sv('<path d="M4 7h3l2-3h6l2 3h3a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="4"/>'),
+  cal:sv('<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/>',18),
+  clock:sv('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',18),
+  pin:sv('<path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>',18),
+  ig:sv('<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".6" fill="currentColor"/>'),
+  wa:sv('<path d="M4 20l1.3-4A8 8 0 1 1 8 18.7z"/><path d="M9 9.5c0 3 2.5 5.5 5.5 5.5l1-1.5-2-1-1 .8a4 4 0 0 1-1.8-1.8l.8-1-1-2z"/>'),
+  mail:sv('<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>')
+};
+const HEART_FILL='<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 21l-1.4-1.3C5.4 15 2 12 2 8.3 2 5.3 4.3 3 7.3 3c1.7 0 3.4.8 4.7 2.1C13.3 3.8 15 3 16.7 3 19.7 3 22 5.3 22 8.3c0 3.7-3.4 6.7-8.6 11.4z"/></svg>';
+
+function qr(text){
+  const n=25, r=rng(hash(text)), m=[];
+  for(let y=0;y<n;y++){m[y]=[];for(let x=0;x<n;x++)m[y][x]=r()>.52}
+  const finder=(ox,oy)=>{for(let y=-1;y<8;y++)for(let x=-1;x<8;x++){const X=ox+x,Y=oy+y;if(X<0||Y<0||X>=n||Y>=n)continue;m[Y][X]=x>=0&&y>=0&&x<7&&y<7&&(x===0||y===0||x===6||y===6||(x>=2&&x<=4&&y>=2&&y<=4))}};
+  finder(0,0);finder(n-7,0);finder(0,n-7);
+  let d='';for(let y=0;y<n;y++)for(let x=0;x<n;x++)if(m[y][x])d+=`M${x} ${y}h1v1h-1z`;
+  return `<svg viewBox="0 0 ${n} ${n}" shape-rendering="crispEdges" aria-label="QR code"><path d="${d}" fill="var(--qr-fg)"/></svg>`;
+}
+
+/* ---------- data ---------- */
+const EVENT = { name:'Social Delas', edition:'2ª edição', date:new Date('2026-12-13T16:00:00-03:00'), dateLabel:'Sábado, 13 de dezembro', time:'16h às 23h', place:'Local revelado em breve', city:'São Paulo · SP', about:'Uma tarde que vira noite, feita para mulheres: pôr do sol, drinks, música boa e conexões que ficam.' };
+const lotes = [
+  {id:1,name:'1º Lote',desc:'Preço de lançamento com 50% de desconto. Quantidade limitada.',price:100,from:200,total:0,active:true},
+  {id:2,name:'2º Lote',desc:'Abre automaticamente quando o 1º lote esgotar.',price:140,from:200,total:150,active:true},
+  {id:3,name:'3º Lote',desc:'Última virada antes da porta.',price:180,from:200,total:100,active:true}
+];
+const coupons = [
+  {code:'DELAS10',type:'%',value:10,uses:12,limit:50,active:true},
+  {code:'AMIGAS20',type:'R$',value:20,uses:30,limit:30,active:true},
+  {code:'PROMOTER',type:'%',value:15,uses:4,limit:100,active:false}
+];
+const FIRST=['Ana','Beatriz','Carol','Duda','Fernanda','Gabi','Helena','Isabela','Júlia','Larissa','Mariana','Natália','Paula','Rafaela','Sofia','Tatiane','Vivian','Camila','Letícia','Bruna','Amanda','Jéssica','Priscila','Renata','Bianca','Lívia'];
+const LAST=['Souza','Lima','Alves','Costa','Rocha','Martins','Ribeiro','Carvalho','Gomes','Freitas','Barros','Moura'];
+const orders=[], tickets=[];
+function addOrder(o){
+  o.id=o.id||Math.max(1000,...orders.map(x=>x.id))+1;
+  o.total=o.unit*o.qty-o.discount;o.tickets=[];
+  for(let j=0;j<o.qty;j++){const t={code:`SD2-${o.id}-${j+1}`,order:o,holder:o.name,used:false,usedAt:null};o.tickets.push(t);tickets.push(t)}
+  orders.push(o);return o;
+}
+(function seed(){
+  const r=rng(42), now=Date.now();
+  for(let i=0;i<64;i++){
+    const f=FIRST[Math.floor(r()*FIRST.length)], l=LAST[Math.floor(r()*LAST.length)];
+    const qty=r()<.6?1:(r()<.7?2:3);
+    const p=r(); const status=p<.86?'pago':(p<.95?'pendente':'cancelado');
+    const date=new Date(now-Math.floor(Math.pow(r(),1.4)*13.5*864e5)-Math.floor(r()*36e5));
+    addOrder({id:5000+i,name:f+' '+l,email:(f+'.'+l).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')+'@email.com',loteId:1,qty,unit:100,discount:0,method:r()<.62?'Pix':'Cartão',status,date});
+  }
+  orders.sort((a,b)=>a.date-b.date).forEach((o,i)=>{o.id=1001+i;o.tickets.forEach((t,j)=>t.code=`SD2-${o.id}-${j+1}`)});
+  lotes[0].total=soldOf(1)+6;
+})();
+function soldOf(id){return orders.filter(o=>o.loteId===id&&o.status==='pago').reduce((s,o)=>s+o.qty,0)}
+function currentLote(){return lotes.find(l=>l.active&&soldOf(l.id)<l.total)||null}
+const loteState = l => soldOf(l.id)>=l.total?'esgotado':(!l.active?'pausado':(currentLote()===l?'venda':'breve'));
+const paid = () => orders.filter(o=>o.status==='pago');
+const validTickets = () => tickets.filter(t=>t.order.status==='pago');
+
+const S = { user:null, admin:false, adminTab:'geral', orderFilter:'todos', orderQ:'', authTab:'entrar', scan:null };
+const demoBuyer = {name:'Mariana Costa',email:'mariana@exemplo.com'};
+
+/* ---------- router ---------- */
+const ROUTES=['inicio','entrar','conta','admin'];
+function route(){const h=location.hash.slice(1);return ROUTES.includes(h)?h:'inicio'}
+function go(r){if(location.hash.slice(1)===r)render();else location.hash=r;window.scrollTo(0,0)}
+window.addEventListener('hashchange',()=>{render();window.scrollTo(0,0)});
+function render(){
+  const r=route();
+  document.querySelectorAll('[data-go]').forEach(b=>b.setAttribute('aria-current',String(b.dataset.go===r)));
+  const app=$('#app');
+  if(r==='inicio') app.innerHTML=viewSite();
+  else if(r==='entrar') app.innerHTML=viewAuth();
+  else if(r==='conta') app.innerHTML=S.user?viewConta():viewAuth('Entre para ver seus ingressos.');
+  else if(r==='admin') app.innerHTML=S.admin?viewAdmin():viewAdminLogin();
+  if(r==='inicio') tick();
+}
+
+/* ---------- SITE ---------- */
+function siteHeader(solid){
+  return `<header class="sitehead ${solid?'solid':''}"><div class="wrap">
+    <a class="brand" href="#inicio" aria-label="Social Delas, início"><img src="assets/logo.webp" alt="Social Delas · Experiências que Conectam" width="87" height="58"></a>
+    <nav class="navpill" aria-label="Site">
+      <a class="lk hide-m" href="#sobre" data-scroll="sobre">O evento</a>
+      <a class="lk hide-m" href="#ingressos" data-scroll="ingressos">Ingressos</a>
+      <a class="lk hide-m" href="#duvidas" data-scroll="duvidas">Dúvidas</a>
+      <a class="lk" href="${S.user?'#conta':'#entrar'}">${S.user?'Meus ingressos':'Entrar'}</a>
+      <button class="btn btn-primary btn-sm" data-act="buy">Comprar</button>
+    </nav></div></header>`;
+}
+function viewSite(){
+  const cl=currentLote(); const left=cl?cl.total-soldOf(cl.id):0;
+  return `${siteHeader()}
+  <section class="hero"><div class="wrap">
+    <div>
+      <span class="kicker"><b>${esc(EVENT.edition).toUpperCase()}</b>${cl?`${esc(cl.name)} com ${Math.round((1-cl.price/cl.from)*100)}% off`:'Ingressos esgotados'}</span>
+      <h1 class="lockup" aria-label="Social Delas, Experiências que Conectam"><span class="s">Social</span><span class="d">DELAS</span><span class="t">Experiências que Conectam</span></h1>
+      <p class="lede">${esc(EVENT.about)}</p>
+      <div class="ctas">${cl?`<button class="btn btn-primary" data-act="buy">Garantir meu ingresso · ${brl(cl.price)}</button>`:''}<a class="btn btn-ghost" href="#ingressos" data-scroll="ingressos">Ver lotes</a></div>
+      <div class="facts"><span>${ICON.cal}${esc(EVENT.dateLabel)}</span><span>${ICON.clock}${esc(EVENT.time)}</span><span>${ICON.pin}${esc(EVENT.city)}</span></div>
+    </div>
+    <div class="posterwrap">
+      <span class="heart" style="width:38px;left:-36px;top:-10px">${HEART_FILL}</span>
+      <span class="heart" style="width:24px;right:-10px;bottom:-30px;animation-delay:-2s">${HEART_FILL}</span>
+      <div class="poster"><img src="assets/banner.webp" alt="Mulheres brindando ao pôr do sol com o logo Social Delas" width="900" height="1600"></div>
+      ${cl&&cl.from>cl.price?`<div class="offbadge"><div><span>${Math.round((1-cl.price/cl.from)*100)}%</span><small>OFF</small></div></div>`:''}
+      <div class="glass cdcard"><span class="eyebrow">Faltam</span><div class="countdown" id="cd"><div><b>--</b><small>dias</small></div><div><b>--</b><small>horas</small></div><div><b>--</b><small>min</small></div><div><b>--</b><small>seg</small></div></div>${cl&&left<=20?`<span class="hint" style="font-weight:700;color:var(--pink-deep)">Restam só ${left} no ${esc(cl.name)}</span>`:''}</div>
+    </div>
+  </div></section>
+  <div class="marquee" aria-hidden="true"><div class="track">${'<span>Pôr do sol</span><em>drinks</em><span>Música boa</span><em>amigas</em><span>Pista cheia</span><em>conexões</em><span>Fotos</span><em>experiências</em>'.repeat(4)}</div></div>
+
+  <section class="section" id="sobre"><div class="wrap about">
+    <div class="pic"><img src="assets/ingresso.webp" alt="Ingressos do Social Delas" width="800" height="834" loading="lazy">
+      <div class="glass note"><b>2ª edição</b><span class="hint">A primeira lotou. Agora é maior.</span></div></div>
+    <div class="body">
+      <span class="eyebrow">O evento</span>
+      <h2>Uma experiência feita <span class="script">para elas</span></h2>
+      <p>O Social Delas reúne mulheres para viver uma tarde que vira noite, com pôr do sol, drinks, música boa e gente nova para conhecer. Chega sozinha, sai com amigas.</p>
+      <div class="pillars">
+        <div class="pillar"><span class="ic">${ICON.music}</span><b>Música a noite toda</b><p>DJs mulheres, do pop ao funk, com set pensado para dançar.</p></div>
+        <div class="pillar"><span class="ic">${ICON.glass}</span><b>Drink de boas-vindas</b><p>Recepção com drink e brinde ao pôr do sol.</p></div>
+        <div class="pillar"><span class="ic">${ICON.cam}</span><b>Espaço instagramável</b><p>Cenários para foto, make station e lembrancinhas.</p></div>
+      </div>
+    </div>
+  </div></section>
+
+  <section class="section tix-sec" id="ingressos"><div class="wrap">
+    <div class="shead"><span class="eyebrow" style="color:var(--pink-deep)">Ingressos</span><h2>Escolha o seu <span class="script">lote</span></h2><p>Os lotes viram sozinhos quando esgotam. Pagou, recebeu o QR code no e-mail e na sua conta.</p></div>
+    <div class="tickets">${lotes.map(ticketRow).join('')}</div>
+    <div class="payicons"><span>Pix aprovado na hora</span><span>Cartão em até 12x</span><span>Compra 100% segura</span></div>
+  </div></section>
+
+  <section class="section"><div class="wrap">
+    <div class="shead"><span class="eyebrow">Programação</span><h2>Como vai ser a <span class="script">tarde</span></h2><p>Horários de exemplo. As atrações são anunciadas no Instagram.</p></div>
+    <div class="sched">
+      <div class="slot"><time>16h</time><b>Portas abertas</b><p>Check-in pelo QR code e drink de boas-vindas.</p></div>
+      <div class="slot hl"><time>18h</time><b>Pôr do sol</b><p>Brinde coletivo e DJ convidada.</p></div>
+      <div class="slot"><time>20h</time><b>Atração surpresa</b><p>Revelada só no dia.</p></div>
+      <div class="slot"><time>21h</time><b>Pista até o fim</b><p>Set longo até as 23h.</p></div>
+    </div>
+  </div></section>
+
+  <section class="quote"><div class="wrap">
+    <span class="script">Chega sozinha, sai com amigas</span>
+    <p class="caps">Social Delas · Experiências que Conectam</p>
+  </div></section>
+
+  <section class="section" id="duvidas"><div class="wrap split">
+    <div>
+      <h2>O <span class="script">local</span></h2>
+      <div class="mapbox">
+        <svg class="map" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><g fill="none" stroke="#FFFFFF" stroke-width="12" opacity=".8"><path d="M-10 80 L410 120"/><path d="M60 -10 L120 310"/><path d="M-10 230 L410 190"/><path d="M280 -10 L250 310"/></g><g fill="none" stroke="#FFFFFF" stroke-width="5" opacity=".6"><path d="M-10 160 L410 150"/><path d="M190 -10 L180 310"/><path d="M340 -10 L370 310"/></g><circle cx="330" cy="60" r="34" fill="#FFC3A0" opacity=".7"/></svg>
+        <div class="glass pin"><span class="dotpin"></span><b style="font-family:var(--f-head)">${esc(EVENT.place)}</b><span class="hint">${esc(EVENT.city)}. O endereço completo aparece aqui e no seu ingresso.</span></div>
+      </div>
+    </div>
+    <div>
+      <h2>Ficou com <span class="script">dúvida?</span></h2>
+      <details open><summary>Como recebo meu ingresso?</summary><p>Assim que o pagamento é aprovado, o QR code chega no seu e-mail e fica salvo em "Meus ingressos". Na entrada, é só mostrar no celular.</p></details>
+      <details><summary>Quais formas de pagamento?</summary><p>Pix com aprovação na hora ou cartão de crédito em até 12x.</p></details>
+      <details><summary>Posso passar o ingresso para uma amiga?</summary><p>Pode. Na sua conta, troque o nome da titular até 24h antes do evento.</p></details>
+      <details><summary>Tem idade mínima?</summary><p>Sim, 18 anos. Leve um documento com foto.</p></details>
+      <details><summary>E se eu desistir?</summary><p>Você pode pedir reembolso em até 7 dias após a compra, desde que falte mais de 48h para o evento.</p></details>
+    </div>
+  </div></section>
+
+  <section class="cta"><div class="wrap">
+    <h2>Garanta o seu antes que <span class="script">vire o lote</span></h2>
+    ${cl?`<p style="color:#5A2840">${esc(cl.name)} por ${brl(cl.price)}${left<=20?` · restam só ${left}`:''}</p><button class="btn btn-primary" data-act="buy">Comprar agora</button>`:'<p>Ingressos esgotados.</p>'}
+  </div></section>
+
+  <footer class="sitefoot"><div class="wrap">
+    <img src="assets/logo.webp" alt="Social Delas" width="129" height="86" loading="lazy">
+    <div style="display:grid;gap:4px"><b style="font-family:var(--f-head)">${esc(EVENT.edition)} · ${esc(EVENT.dateLabel)}</b><span class="hint">${esc(EVENT.city)} · Pagamentos processados com segurança</span></div>
+    <div class="socials" aria-label="Redes sociais"><span title="Instagram">${ICON.ig}</span><span title="WhatsApp">${ICON.wa}</span><span title="E-mail">${ICON.mail}</span></div>
+  </div></footer>`;
+}
+function ticketRow(l){
+  const st=loteState(l), left=l.total-soldOf(l.id);
+  const chip={venda:`<span class="chip ok">À venda · restam ${left}</span>`,esgotado:'<span class="chip bad">Esgotado</span>',breve:'<span class="chip mute">Em breve</span>',pausado:'<span class="chip warn">Pausado</span>'}[st];
+  return `<article class="ticket ${st==='esgotado'?'off':''}">
+    <div class="art">
+      <div><div class="s">Social</div><div class="d">DELAS</div></div>
+      <div><h3>${esc(l.name)}</h3><p>${esc(l.desc)}</p></div>
+      ${st==='esgotado'?'<span class="stamp">ESGOTADO</span>':''}
+    </div>
+    <div class="stub">${chip}<div class="price">${l.from>l.price?`<s>${brl(l.from)}</s>`:''}<b>${brl(l.price)}</b></div>
+      ${st==='venda'?`<button class="btn btn-primary btn-sm" data-act="buy">Comprar</button>`:`<button class="btn btn-ghost btn-sm" disabled>${st==='esgotado'?'Esgotado':'Em breve'}</button>`}
+      <div class="barcode" aria-hidden="true"></div></div>
+  </article>`;
+}
+let cdTimer=null;
+function tick(){
+  clearInterval(cdTimer);
+  const upd=()=>{const el=$('#cd');if(!el){clearInterval(cdTimer);return}
+    const s=Math.max(0,Math.floor((EVENT.date-Date.now())/1000));const v=[Math.floor(s/86400),Math.floor(s%86400/3600),Math.floor(s%3600/60),s%60];
+    el.querySelectorAll('b').forEach((b,i)=>b.textContent=pad(v[i]));};
+  upd();cdTimer=setInterval(upd,1000);
+}
+
+/* ---------- AUTH ---------- */
+function viewAuth(msg){
+  const t=S.authTab;
+  return `<div class="authwrap">
+    <div class="art"><div><span class="script">Seus ingressos num lugar só</span><span>QR code de entrada, transferência para amigas e seus pedidos.</span></div></div>
+    <div class="authform"><div class="wrap"><form class="box" id="authform">
+      <a href="#inicio" style="justify-self:center"><img src="assets/logo.webp" alt="Social Delas" width="150" height="100"></a>
+      ${msg?`<p class="demo-note">${esc(msg)}</p>`:''}
+      <div class="tabs" role="tablist"><button type="button" role="tab" aria-selected="${t==='entrar'}" data-act="authtab" data-v="entrar">Entrar</button><button type="button" role="tab" aria-selected="${t==='criar'}" data-act="authtab" data-v="criar">Criar conta</button></div>
+      <h1>${t==='entrar'?'Bem-vinda <span class="script">de volta</span>':'Crie sua <span class="script">conta</span>'}</h1>
+      <button type="button" class="btn btn-ghost" data-act="login"><svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>Continuar com Google</button>
+      <div class="or">ou com e-mail</div>
+      ${t==='criar'?`<div class="field"><label for="a-nome">Nome completo</label><input id="a-nome" value="${esc(demoBuyer.name)}"></div>`:''}
+      <div class="field"><label for="a-email">E-mail</label><input id="a-email" type="email" value="${esc(demoBuyer.email)}"></div>
+      <div class="field"><label for="a-senha">Senha</label><input id="a-senha" type="password" value="exemplo123"></div>
+      ${t==='entrar'?`<a href="#entrar" class="hint" data-act="forgot">Esqueci minha senha</a>`:`<p class="hint">Ao criar a conta você aceita os termos de uso e a política de privacidade.</p>`}
+      <button class="btn btn-primary" type="submit">${t==='entrar'?'Entrar':'Criar conta'}</button>
+    </form></div></div></div>`;
+}
+function viewAdminLogin(){
+  return `<div class="authwrap">
+    <div class="art"><div><span class="script">Painel da organização</span><span>Vendas em tempo real, lotes, cupons e check-in na porta.</span></div></div>
+    <div class="authform"><div class="wrap"><form class="box" id="adminform">
+      <img src="assets/logo.webp" alt="Social Delas" width="150" height="100" style="justify-self:center">
+      <span class="eyebrow">Acesso restrito</span>
+      <h1>Entrar como <span class="script">organizadora</span></h1>
+      <div class="field"><label for="ad-email">E-mail</label><input id="ad-email" type="email" value="organizacao@socialdelas.com.br"></div>
+      <div class="field"><label for="ad-senha">Senha</label><input id="ad-senha" type="password" value="exemplo123"></div>
+      <button class="btn btn-primary" type="submit">Acessar painel</button>
+      <p class="hint">No site real, só contas com permissão de administradora entram aqui.</p>
+    </form></div></div></div>`;
+}
+
+/* ---------- CONTA ---------- */
+function viewConta(){
+  const mine=tickets.filter(t=>t.order.email===S.user.email&&t.order.status!=='cancelado');
+  return `${siteHeader(true)}<div class="acct"><div class="wrap">
+    <div class="acct-head"><div><div class="eyebrow">Minha conta</div><h1>Oi, <span class="script">${esc(S.user.name.split(' ')[0])}</span></h1></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-primary btn-sm" data-act="buy">Comprar mais</button><button class="btn btn-ghost btn-sm" data-act="logout">Sair</button></div></div>
+    ${mine.length?`<div class="mytickets">${mine.map(t=>{const ok=t.order.status==='pago';return `
+      <article class="mt"><div class="top"><div><div class="s">Social</div><div class="d">DELAS</div></div>
+        ${t.used?'<span class="chip mute">Utilizado</span>':ok?'<span class="chip ok">Válido</span>':'<span class="chip warn">Aguardando pagamento</span>'}</div>
+        <div class="qrz"><div class="qr">${qr(t.code)}</div></div>
+        <div class="meta"><div><span class="k">Titular</span>${esc(t.holder)}</div><div><span class="k">Lote</span>${esc(lotes.find(l=>l.id===t.order.loteId).name)}</div><div><span class="k">Data</span>${esc(EVENT.dateLabel)}</div><div><span class="k">Código</span><span class="mono" style="font-size:.82rem">${t.code}</span></div></div>
+        <div class="actions"><button class="btn btn-ghost btn-sm" data-act="transfer">Transferir</button><button class="btn btn-ghost btn-sm" data-act="wallet">Adicionar à carteira</button></div>
+      </article>`}).join('')}</div>`:
+      `<div class="empty" style="margin-bottom:64px"><b style="color:var(--ink);font-family:var(--f-head);font-size:1.1rem">Você ainda não tem ingressos</b><p>Quando comprar, o QR code de entrada aparece aqui.</p><button class="btn btn-primary" data-act="buy">Comprar ingresso</button></div>`}
+  </div></div>`;
+}
+
+/* ---------- ADMIN ---------- */
+const TABS=[['geral','Visão geral','home'],['pedidos','Pedidos','list'],['lotes','Lotes','ticket'],['checkin','Check-in','scan'],['cupons','Cupons','tag'],['evento','Evento','gear']];
+const loteChip = l => ({venda:'<span class="chip ok">À venda no site</span>',esgotado:'<span class="chip bad">Esgotado</span>',breve:'<span class="chip mute">Na fila</span>',pausado:'<span class="chip warn">Pausado</span>'})[loteState(l)];
+function viewAdmin(){
+  const t=S.adminTab;
+  return `<div class="admin">
+    <nav class="side-nav" aria-label="Painel"><img src="assets/logo.webp" alt="Social Delas" width="150" height="100">
+      ${TABS.map(([k,l,i])=>`<button data-act="atab" data-v="${k}" aria-current="${t===k}">${ICON[i]}${l}</button>`).join('')}
+      <span class="sp"></span><button data-act="alogout">${ICON.out}Sair</button></nav>
+    <section class="admin-main">${({geral:aGeral,pedidos:aPedidos,lotes:aLotes,checkin:aCheckin,cupons:aCupons,evento:aEvento})[t]()}</section>
+  </div>`;
+}
+function aGeral(){
+  const p=paid(), rev=p.reduce((s,o)=>s+o.total,0), sold=p.reduce((s,o)=>s+o.qty,0), cap=lotes.reduce((s,l)=>s+l.total,0);
+  const pend=orders.filter(o=>o.status==='pendente').length, used=validTickets().filter(t=>t.used).length;
+  const today=new Date();today.setHours(0,0,0,0);
+  const todayN=p.filter(o=>o.date>=today).reduce((s,o)=>s+o.qty,0);
+  return `<div class="admin-top"><div><div class="eyebrow">${esc(EVENT.name)} · ${esc(EVENT.edition)}</div><h1>Visão geral</h1></div><span class="chip ok">Vendas abertas</span></div>
+  <div class="kpis">
+    <div class="kpi hl"><span class="eyebrow">Receita</span><b>${brl(rev)}</b><small>${p.length} pedidos pagos</small></div>
+    <div class="kpi"><span class="eyebrow">Ingressos vendidos</span><b>${sold}</b><small>de ${cap} no total · +${todayN} hoje</small></div>
+    <div class="kpi"><span class="eyebrow">Aguardando pagamento</span><b>${pend}</b><small>Pix gerado, ainda não pago</small></div>
+    <div class="kpi"><span class="eyebrow">Check-ins</span><b>${used}</b><small>de ${validTickets().length} ingressos válidos</small></div>
+  </div>
+  <div class="cols">
+    <div class="panel"><h3>Ingressos vendidos por dia</h3><p class="sub">Últimos 14 dias · pedidos pagos</p><div class="chartwrap" id="chart">${chart()}</div></div>
+    <div class="panel"><h3>Lotes</h3><p class="sub">Vendidos sobre o total de cada lote</p>
+      ${lotes.map(l=>{const s=soldOf(l.id);return `<div class="meter"><div class="row"><b>${esc(l.name)}</b><span class="num">${s} / ${l.total}</span></div><div class="bar"><i style="width:${Math.min(100,s/l.total*100)}%"></i></div><div class="row hint"><span>${brl(l.price)}</span>${loteChip(l)}</div></div>`}).join('')}
+    </div>
+  </div>
+  <div class="panel" style="margin-top:14px"><h3>Últimos pedidos</h3><p class="sub">Atualiza sozinho quando um pagamento é confirmado</p>${orderTable(orders.slice().sort((a,b)=>b.date-a.date).slice(0,5))}</div>`;
+}
+function chart(){
+  const days=14, W=640, H=230, pl=34, pr=8, pt=14, pb=30, now=new Date();now.setHours(0,0,0,0);
+  const data=[];for(let i=days-1;i>=0;i--){const d=new Date(now-i*864e5),e=new Date(+d+864e5);const os=paid().filter(o=>o.date>=d&&o.date<e);data.push({d,n:os.reduce((s,o)=>s+o.qty,0),v:os.reduce((s,o)=>s+o.total,0)})}
+  const mx=Math.max(1,...data.map(x=>x.n)), step=Math.max(1,Math.ceil(mx/4)), top=step*4;
+  const ih=H-pt-pb, iw=W-pl-pr, bw=iw/days, w=Math.min(26,bw-6), y=v=>pt+ih-(v/top)*ih;
+  let g='';for(let k=0;k<=4;k++){const v=step*k,yy=y(v);g+=`<line x1="${pl}" x2="${W-pr}" y1="${yy}" y2="${yy}" stroke="#F5DCE7" stroke-width="1"/><text x="${pl-8}" y="${yy+4}" text-anchor="end">${v}</text>`}
+  let b='';data.forEach((p,i)=>{const x=pl+i*bw+(bw-w)/2, y0=y(0), yt=y(p.n), h=y0-yt, r=Math.min(4,h);
+    if(p.n>0)b+=`<path d="M${x} ${y0}V${yt+r}Q${x} ${yt} ${x+r} ${yt}H${x+w-r}Q${x+w} ${yt} ${x+w} ${yt+r}V${y0}Z" fill="#E8177D"/>`;
+    if(i%2===(days-1)%2)b+=`<text x="${x+w/2}" y="${H-10}" text-anchor="middle">${dShort(p.d)}</text>`;
+    b+=`<rect x="${pl+i*bw}" y="${pt}" width="${bw}" height="${ih}" fill="transparent" data-tip="${dShort(p.d)}|${p.n}|${brl(p.v)}" data-cx="${x+w/2}" data-cy="${Math.min(yt,y0-2)}"/>`});
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Ingressos vendidos por dia nos últimos 14 dias">${g}<line x1="${pl}" x2="${W-pr}" y1="${y(0)}" y2="${y(0)}" stroke="#C9A3B5" stroke-width="1"/>${b}</svg><div class="tip" id="tip" hidden></div>`;
+}
+const statusChip = s => ({pago:'<span class="chip ok">Pago</span>',pendente:'<span class="chip warn">Pendente</span>',cancelado:'<span class="chip bad">Cancelado</span>'})[s];
+function orderTable(list){
+  return `<div class="tablewrap"><table><thead><tr><th>Pedido</th><th>Compradora</th><th>Lote</th><th class="r">Qtd</th><th class="r">Valor</th><th>Pagamento</th><th>Status</th><th>Data</th></tr></thead><tbody>
+  ${list.map(o=>`<tr><td class="mono">#${o.id}</td><td><b>${esc(o.name)}</b><br><span class="hint">${esc(o.email)}</span></td><td>${esc(lotes.find(l=>l.id===o.loteId).name)}</td><td class="r">${o.qty}</td><td class="r">${brl(o.total)}</td><td>${o.method}</td><td>${statusChip(o.status)}</td><td>${dTime(o.date)}</td></tr>`).join('')||'<tr><td colspan="8" class="hint" style="text-align:center;padding:28px">Nenhum pedido encontrado com esse filtro.</td></tr>'}
+  </tbody></table></div>`;
+}
+function filteredOrders(){
+  const q=S.orderQ.trim().toLowerCase();
+  return orders.filter(o=>(S.orderFilter==='todos'||o.status===S.orderFilter)&&(!q||o.name.toLowerCase().includes(q)||o.email.includes(q)||String(o.id).includes(q))).sort((a,b)=>b.date-a.date);
+}
+function aPedidos(){
+  const c=k=>k==='todos'?orders.length:orders.filter(o=>o.status===k).length;
+  return `<div class="admin-top"><div><div class="eyebrow">Vendas</div><h1>Pedidos</h1></div><button class="btn btn-ghost btn-sm" data-act="csv">Exportar lista (Excel/CSV)</button></div>
+  <div class="toolbar"><input id="oq" type="search" placeholder="Buscar por nome, e-mail ou nº do pedido" value="${esc(S.orderQ)}" aria-label="Buscar pedidos">
+    <div class="fchips">${['todos','pago','pendente','cancelado'].map(k=>`<button data-act="ofilter" data-v="${k}" aria-pressed="${S.orderFilter===k}">${k[0].toUpperCase()+k.slice(1)} · ${c(k)}</button>`).join('')}</div></div>
+  <div id="otable">${orderTable(filteredOrders())}</div>`;
+}
+function aLotes(){
+  return `<div class="admin-top"><div><div class="eyebrow">Vendas</div><h1>Lotes</h1></div><button class="btn btn-primary btn-sm" data-act="newlote">Novo lote</button></div>
+  <p class="hint" style="margin:-12px 0 18px;max-width:62ch">O site mostra sempre o primeiro lote ativo com ingressos disponíveis. Quando ele esgota, o próximo abre sozinho.</p>
+  <div class="lotes-admin">${lotes.map(l=>{const s=soldOf(l.id);return `<div class="panel lote-card">
+    <header><h3 style="margin:0">${esc(l.name)}</h3><label class="switch" title="Ativar ou pausar vendas"><input type="checkbox" data-act="ltoggle" data-id="${l.id}" ${l.active?'checked':''} aria-label="Vendas do ${esc(l.name)}"><span></span></label></header>
+    <div>${loteChip(l)}</div>
+    <div class="grid2"><div class="field"><label for="lp-${l.id}">Preço (R$)</label><input id="lp-${l.id}" type="number" min="0" value="${l.price}"></div><div class="field"><label for="lt-${l.id}">Quantidade</label><input id="lt-${l.id}" type="number" min="${s}" value="${l.total}"></div></div>
+    <div class="meter" style="padding:0;border:0"><div class="row hint"><span>${s} vendidos</span><span>${Math.max(0,l.total-s)} restantes</span></div><div class="bar"><i style="width:${Math.min(100,s/l.total*100)}%"></i></div></div>
+    <button class="btn btn-ghost btn-sm" data-act="lsave" data-id="${l.id}">Salvar alterações</button></div>`}).join('')}</div>`;
+}
+function aCheckin(){
+  const v=validTickets(), used=v.filter(t=>t.used), r=S.scan;
+  const res=!r?`<div class="result idle"><b>Pronto para ler</b><span>Aponte a câmera para o QR code do ingresso ou digite o código.</span></div>`:
+    r.kind==='ok'?`<div class="result ok"><b>Entrada liberada</b><span class="who">${esc(r.t.holder)} · ${esc(lotes.find(l=>l.id===r.t.order.loteId).name)}</span><span class="mono">${r.t.code}</span></div>`:
+    r.kind==='used'?`<div class="result bad"><b>Ingresso já utilizado</b><span class="who">${esc(r.t.holder)} entrou às ${pad(r.t.usedAt.getHours())}:${pad(r.t.usedAt.getMinutes())}</span><span class="mono">${r.t.code}</span></div>`:
+    `<div class="result bad"><b>Código não encontrado</b><span>Confira o código ou se o pedido foi pago.</span><span class="mono">${esc(r.code)}</span></div>`;
+  return `<div class="admin-top"><div><div class="eyebrow">Portaria</div><h1>Check-in</h1></div><span class="chip ok num">${used.length} de ${v.length} entraram</span></div>
+  <div class="scan">
+    <div class="panel" style="display:grid;gap:14px"><div class="viewfinder"><div class="laser"></div><span class="hint" style="position:relative;color:#FFFFFF;opacity:.75">Câmera do celular</span></div>
+      <button class="btn btn-primary" data-act="scan">Simular leitura de QR code</button>
+      <form id="codeform" class="copyline"><input id="code" placeholder="SD2-1001-1" aria-label="Código do ingresso"><button class="btn btn-ghost btn-sm" type="submit">Validar</button></form></div>
+    <div style="display:grid;gap:14px;align-content:start">${res}
+      <div class="panel"><h3>Últimas entradas</h3><p class="sub">Funciona em vários celulares ao mesmo tempo</p>
+      ${used.length?used.slice().sort((a,b)=>b.usedAt-a.usedAt).slice(0,6).map(t=>`<div class="line" style="padding-block:8px;border-top:1px solid var(--line)"><span>${esc(t.holder)}</span><span class="mono hint">${pad(t.usedAt.getHours())}:${pad(t.usedAt.getMinutes())}</span></div>`).join(''):'<p class="hint">Nenhuma entrada registrada ainda. Use o botão de simular leitura.</p>'}</div></div>
+  </div>`;
+}
+function aCupons(){
+  return `<div class="admin-top"><div><div class="eyebrow">Vendas</div><h1>Cupons</h1></div></div>
+  <div class="cols"><div class="tablewrap"><table style="min-width:520px"><thead><tr><th>Código</th><th>Desconto</th><th class="r">Usos</th><th>Status</th></tr></thead><tbody>
+  ${coupons.map(c=>`<tr><td class="mono"><b>${esc(c.code)}</b></td><td>${c.type==='%'?c.value+'%':brl(c.value)}</td><td class="r">${c.uses} / ${c.limit}</td><td>${!c.active?'<span class="chip mute">Desativado</span>':c.uses>=c.limit?'<span class="chip bad">Esgotado</span>':'<span class="chip ok">Ativo</span>'}</td></tr>`).join('')}
+  </tbody></table></div>
+  <form class="panel" id="couponform" style="display:grid;gap:12px;align-content:start"><h3>Novo cupom</h3>
+    <div class="field"><label for="c-code">Código</label><input id="c-code" value="NATAL15" style="text-transform:uppercase"></div>
+    <div class="grid2"><div class="field"><label for="c-type">Tipo</label><select id="c-type"><option value="%">Porcentagem</option><option value="R$">Valor fixo</option></select></div><div class="field"><label for="c-val">Valor</label><input id="c-val" type="number" value="15" min="1"></div></div>
+    <div class="field"><label for="c-lim">Limite de usos</label><input id="c-lim" type="number" value="40" min="1"></div>
+    <button class="btn btn-primary" type="submit">Criar cupom</button><p class="hint">Teste na compra: o cupom DELAS10 dá 10% de desconto.</p></form></div>`;
+}
+function aEvento(){
+  return `<div class="admin-top"><div><div class="eyebrow">Configurações</div><h1>Evento</h1></div></div>
+  <form class="panel" id="eventform" style="display:grid;gap:14px;max-width:720px">
+    <p class="hint">Tudo que muda aqui atualiza o site na hora, sem precisar de programador.</p>
+    <div class="grid2"><div class="field"><label for="e-name">Nome do evento</label><input id="e-name" value="${esc(EVENT.name)}"></div><div class="field"><label for="e-ed">Edição</label><input id="e-ed" value="${esc(EVENT.edition)}"></div></div>
+    <div class="grid2"><div class="field"><label for="e-date">Data (texto do site)</label><input id="e-date" value="${esc(EVENT.dateLabel)}"></div><div class="field"><label for="e-time">Horário</label><input id="e-time" value="${esc(EVENT.time)}"></div></div>
+    <div class="grid2"><div class="field"><label for="e-place">Local</label><input id="e-place" value="${esc(EVENT.place)}"></div><div class="field"><label for="e-city">Cidade</label><input id="e-city" value="${esc(EVENT.city)}"></div></div>
+    <div class="field"><label for="e-about">Chamada principal</label><input id="e-about" value="${esc(EVENT.about)}"></div>
+    <div><button class="btn btn-primary" type="submit">Salvar e ver no site</button></div>
+  </form>`;
+}
+
+/* ---------- CHECKOUT ---------- */
+let CO=null, pixTimer=null;
+function openCheckout(){
+  const l=currentLote(); if(!l){toast('Ingressos esgotados no momento.');return}
+  CO={step:1,lote:l,qty:1,coupon:null,couponMsg:'',method:'pix',inst:1,name:S.user?S.user.name:demoBuyer.name,email:S.user?S.user.email:demoBuyer.email,cpf:'123.456.789-09',phone:'(11) 98765-4321'};
+  renderCO();
+}
+function coTotals(){const sub=CO.lote.price*CO.qty;let disc=0;if(CO.coupon){disc=CO.coupon.type==='%'?sub*CO.coupon.value/100:Math.min(sub,CO.coupon.value)}disc=Math.round(disc*100)/100;return{sub,disc,total:sub-disc}}
+const instTotal=(t,n)=>n===1?t:Math.round(t*(1+0.0213*(n-1))*100)/100;
+function renderCO(){
+  clearInterval(pixTimer);
+  if(!CO){$('#modal-root').innerHTML='';return}
+  const {sub,disc,total}=coTotals(), s=CO.step, left=CO.lote.total-soldOf(CO.lote.id);
+  let body='', foot='';
+  if(s===1){
+    body=`<div class="minitix"><img src="assets/ingresso.webp" alt="" width="76" height="76"><div style="flex:1;min-width:0"><b>${esc(CO.lote.name)}</b><br><span class="hint">Social Delas · ${esc(EVENT.dateLabel)}</span></div><b>${brl(CO.lote.price)}</b></div>
+    <div class="line" style="align-items:center"><span style="font-family:var(--f-head);font-weight:700">Quantidade</span><div class="qty"><button type="button" data-act="qty" data-v="-1" aria-label="Diminuir">−</button><output class="num">${CO.qty}</output><button type="button" data-act="qty" data-v="1" aria-label="Aumentar">+</button></div></div>
+    <p class="hint" style="margin-top:-8px">Máximo de 4 por pedido · restam ${left} neste lote</p>
+    <form id="cpform" class="copyline"><input id="cp" placeholder="Cupom de desconto" value="${CO.coupon?esc(CO.coupon.code):''}" aria-label="Cupom de desconto"><button class="btn btn-ghost btn-sm" type="submit">Aplicar</button></form>
+    ${CO.couponMsg?`<p class="hint" style="color:${CO.coupon?'var(--ok)':'var(--bad)'};font-weight:700">${esc(CO.couponMsg)}</p>`:'<p class="hint" style="margin-top:-8px">Experimente o cupom DELAS10.</p>'}
+    <div style="display:grid;gap:6px"><div class="line muted"><span>Subtotal</span><span class="num">${brl(sub)}</span></div>${disc?`<div class="line muted"><span>Desconto</span><span class="num">− ${brl(disc)}</span></div>`:''}</div>`;
+    foot=`<div class="tot"><span class="hint">Total</span><b>${brl(total)}</b></div><button class="btn btn-primary" data-act="co-next">Continuar</button>`;
+  } else if(s===2){
+    body=`${S.user?`<p class="demo-note">Logada como <b>${esc(S.user.email)}</b>. Confira os dados da titular.</p>`:`<p class="demo-note">Não precisa ter conta: criamos uma com este e-mail para você acessar seus ingressos depois.</p>`}
+    <div class="field"><label for="b-name">Nome completo da titular</label><input id="b-name" value="${esc(CO.name)}"></div>
+    <div class="field"><label for="b-email">E-mail</label><input id="b-email" type="email" value="${esc(CO.email)}"></div>
+    <div class="grid2"><div class="field"><label for="b-cpf">CPF</label><input id="b-cpf" value="${esc(CO.cpf)}" inputmode="numeric"></div><div class="field"><label for="b-phone">WhatsApp</label><input id="b-phone" value="${esc(CO.phone)}" inputmode="tel"></div></div>
+    ${CO.qty>1?`<p class="hint">Os outros ${CO.qty-1} ingressos podem ser transferidos para suas amigas depois, pela sua conta.</p>`:''}`;
+    foot=`<button class="btn btn-ghost" data-act="co-back">Voltar</button><button class="btn btn-primary" data-act="co-next">Ir para pagamento</button>`;
+  } else if(s===3){
+    const pix=CO.method==='pix';
+    body=`<div class="paytabs"><button data-act="method" data-v="pix" aria-pressed="${pix}"><b>Pix</b><small>Aprovação na hora</small></button><button data-act="method" data-v="card" aria-pressed="${!pix}"><b>Cartão de crédito</b><small>Até 12x</small></button></div>
+    ${pix?`<div class="pixbox"><div class="qr">${qr('pix'+total+CO.email)}</div><div style="display:grid;gap:10px;min-width:0"><b style="font-family:var(--f-head)">Escaneie com o app do seu banco</b><span class="hint">Ou copie o código Pix:</span>
+      <div class="copyline"><input id="pixcode" class="mono" readonly value="00020126580014BR.GOV.BCB.PIX0136a1b2c3d4-socialdelas-${Math.round(total*100)}5204000053039865802BR5912SOCIAL DELAS6009SAO PAULO6304A1F9" aria-label="Código Pix copia e cola"><button class="btn btn-ghost btn-sm" data-act="copypix">Copiar</button></div>
+      <div class="waiting"><span class="dot"></span>Aguardando pagamento · expira em <b class="num" id="pixt">15:00</b></div></div></div>
+      <p class="demo-note">No site real, esta tela confirma sozinha quando o banco avisa que o Pix caiu. Aqui, use o botão abaixo para simular.</p>`:
+    `<div class="field"><label for="cc-n">Número do cartão</label><input id="cc-n" value="4111 1111 1111 1111" inputmode="numeric"></div>
+     <div class="grid2"><div class="field"><label for="cc-e">Validade</label><input id="cc-e" value="12/29"></div><div class="field"><label for="cc-c">CVV</label><input id="cc-c" value="123" inputmode="numeric"></div></div>
+     <div class="field"><label for="cc-name">Nome impresso no cartão</label><input id="cc-name" value="${esc(CO.name.toUpperCase())}"></div>
+     <div class="field"><label for="cc-i">Parcelas</label><select id="cc-i">${Array.from({length:12},(_,i)=>{const n=i+1,t=instTotal(total,n);return `<option value="${n}" ${CO.inst===n?'selected':''}>${n}x de ${brl(t/n)}${n===1?' sem juros':` (total ${brl(t)})`}</option>`}).join('')}</select></div>
+     <p class="hint">Dados de cartão de exemplo. No site real eles vão direto para o gateway de pagamento e nunca ficam salvos no site.</p>`}`;
+    foot=`<button class="btn btn-ghost" data-act="co-back">Voltar</button><button class="btn btn-primary" data-act="co-pay">${pix?'Simular Pix pago':'Pagar '+brl(instTotal(total,CO.inst))}</button>`;
+  } else {
+    const o=CO.order;
+    body=`<div class="success"><span class="script">Você vai!</span><h3 style="font-size:1.3rem">Pagamento aprovado</h3>
+      <p class="hint" style="max-width:40ch">Pedido <b class="mono">#${o.id}</b>. Enviamos ${o.qty>1?'os ingressos':'o ingresso'} para <b>${esc(o.email)}</b>. ${o.qty>1?'Eles também estão':'Ele também está'} na sua conta.</p>
+      <div class="qr">${qr(o.tickets[0].code)}</div><span class="mono hint">${o.tickets[0].code}${o.qty>1?` + ${o.qty-1}`:''}</span></div>`;
+    foot=`<button class="btn btn-ghost" data-act="co-close">Fechar</button><button class="btn btn-primary" data-act="co-mine">Ver meus ingressos</button>`;
+  }
+  const titles=['','Seus <span class="script">ingressos</span>','Seus <span class="script">dados</span>','<span class="script">Pagamento</span>','Tudo <span class="script">certo</span>'];
+  $('#modal-root').innerHTML=`<div class="overlay" data-act="co-overlay"><div class="modal" role="dialog" aria-modal="true" aria-label="Comprar ingresso">
+    <header><h3>${titles[s]}</h3><button class="x" data-act="co-close" aria-label="Fechar">✕</button></header>
+    <div class="steps">${[1,2,3,4].map(i=>`<i class="${i<=s?'on':''}"></i>`).join('')}</div>
+    <div class="mbody">${body}</div><div class="mfoot">${foot}</div></div></div>`;
+  if(s===3&&CO.method==='pix'){let left=900;pixTimer=setInterval(()=>{left--;const el=$('#pixt');if(!el||left<0){clearInterval(pixTimer);return}el.textContent=pad(Math.floor(left/60))+':'+pad(left%60)},1000)}
+}
+function finishPayment(){
+  const {disc}=coTotals();
+  const o=addOrder({name:CO.name,email:CO.email,loteId:CO.lote.id,qty:CO.qty,unit:CO.lote.price,discount:disc,method:CO.method==='pix'?'Pix':'Cartão',status:'pago',date:new Date()});
+  if(CO.coupon)CO.coupon.uses++;
+  if(!S.user||S.user.email!==CO.email)S.user={name:CO.name,email:CO.email};
+  CO.order=o;CO.step=4;renderCO();render();
+}
+
+let toastT=null;
+function toast(msg){$('#toast-root').innerHTML=`<div class="toast" role="status">${esc(msg)}</div>`;clearTimeout(toastT);toastT=setTimeout(()=>$('#toast-root').innerHTML='',3000)}
+
+/* ---------- events ---------- */
+document.addEventListener('click',e=>{
+  const g=e.target.closest('[data-go]'); if(g){go(g.dataset.go);return}
+  const sc=e.target.closest('[data-scroll]'); if(sc){e.preventDefault();if(route()!=='inicio'){go('inicio');setTimeout(()=>{const el=document.getElementById(sc.dataset.scroll);if(el)el.scrollIntoView()},50);return}const el=document.getElementById(sc.dataset.scroll);if(el)el.scrollIntoView();return}
+  const a=e.target.closest('[data-act]'); if(!a)return;
+  const act=a.dataset.act, v=a.dataset.v;
+  if(act==='co-overlay'){if(e.target===a){CO=null;renderCO()}return}
+  if(a.tagName==='INPUT')return;
+  switch(act){
+    case 'buy': openCheckout(); break;
+    case 'qty': CO.qty=Math.max(1,Math.min(4,CO.lote.total-soldOf(CO.lote.id),CO.qty+Number(v)));renderCO();break;
+    case 'co-next':
+      if(CO.step===2){CO.name=$('#b-name').value.trim()||CO.name;CO.email=$('#b-email').value.trim()||CO.email;CO.cpf=$('#b-cpf').value;CO.phone=$('#b-phone').value}
+      CO.step++;renderCO();break;
+    case 'co-back': CO.step--;renderCO();break;
+    case 'method': CO.method=v;renderCO();break;
+    case 'co-pay':
+      if(CO.method==='card'){CO.inst=Number($('#cc-i').value);a.disabled=true;a.textContent='Processando…';setTimeout(finishPayment,900)}
+      else finishPayment();break;
+    case 'copypix':{const inp=$('#pixcode');const fb=()=>{inp.select();toast('Código selecionado. Use Ctrl+C para copiar.')};try{navigator.clipboard.writeText(inp.value).then(()=>toast('Código Pix copiado'),fb)}catch(err){fb()}break}
+    case 'co-close': CO=null;renderCO();break;
+    case 'co-mine': CO=null;renderCO();go('conta');break;
+    case 'authtab': S.authTab=v;render();break;
+    case 'login': S.user={...demoBuyer};toast('Login com Google simulado');go('conta');break;
+    case 'forgot': e.preventDefault();toast('No site real, enviamos um link para redefinir a senha.');break;
+    case 'logout': S.user=null;go('inicio');break;
+    case 'transfer': toast('No site real, você digita o nome e o e-mail da amiga e o ingresso passa para ela.');break;
+    case 'wallet': toast('No site real, o ingresso vai para a carteira do celular.');break;
+    case 'atab': S.adminTab=v;if(v!=='checkin')S.scan=null;render();break;
+    case 'alogout': S.admin=false;go('inicio');break;
+    case 'ofilter': S.orderFilter=v;render();break;
+    case 'csv': toast(`No site real, baixa uma planilha com ${filteredOrders().length} pedidos.`);break;
+    case 'newlote': {const n=lotes.length+1;lotes.push({id:n,name:n+'º Lote',desc:'Novo lote.',price:200,from:200,total:50,active:false});toast(n+'º Lote criado (pausado)');render();break}
+    case 'lsave': {const l=lotes.find(x=>x.id===Number(a.dataset.id));const p=Number($('#lp-'+l.id).value),t=Number($('#lt-'+l.id).value);if(p>0)l.price=p;if(t>=soldOf(l.id))l.total=t;toast(l.name+' atualizado. O site já mostra o novo valor.');render();break}
+    case 'scan': {const pool=validTickets();checkCode(pool[Math.floor(Math.random()*pool.length)].code);break}
+  }
+});
+document.addEventListener('change',e=>{
+  const a=e.target.closest('[data-act="ltoggle"]'); if(a){const l=lotes.find(x=>x.id===Number(a.dataset.id));l.active=a.checked;toast(l.name+(l.active?' ativado':' pausado'));render()}
+  if(e.target.id==='cc-i'&&CO){CO.inst=Number(e.target.value);renderCO()}
+});
+document.addEventListener('input',e=>{if(e.target.id==='oq'){S.orderQ=e.target.value;$('#otable').innerHTML=orderTable(filteredOrders())}});
+document.addEventListener('submit',e=>{
+  e.preventDefault();const id=e.target.id;
+  if(id==='authform'){const em=$('#a-email').value.trim()||demoBuyer.email;const nm=$('#a-nome')?$('#a-nome').value.trim():(em===demoBuyer.email?demoBuyer.name:em.split('@')[0]);S.user={name:nm||'Convidada',email:em};toast(S.authTab==='criar'?'Conta criada':'Login feito');go('conta')}
+  if(id==='adminform'){S.admin=true;S.adminTab='geral';render()}
+  if(id==='cpform'){const c=coupons.find(x=>x.code===$('#cp').value.trim().toUpperCase());
+    if(!c){CO.coupon=null;CO.couponMsg='Cupom não encontrado. Confira o código.'}
+    else if(!c.active||c.uses>=c.limit){CO.coupon=null;CO.couponMsg='Este cupom não está mais disponível.'}
+    else{CO.coupon=c;CO.couponMsg=`Cupom ${c.code} aplicado: ${c.type==='%'?c.value+'%':brl(c.value)} de desconto.`}renderCO()}
+  if(id==='codeform'){checkCode($('#code').value)}
+  if(id==='couponform'){const code=$('#c-code').value.trim().toUpperCase().replace(/[^A-Z0-9]/g,'');if(!code){toast('Digite um código para o cupom.');return}if(coupons.some(c=>c.code===code)){toast('Já existe um cupom com esse código.');return}coupons.push({code,type:$('#c-type').value,value:Number($('#c-val').value)||10,uses:0,limit:Number($('#c-lim').value)||50,active:true});toast('Cupom '+code+' criado');render()}
+  if(id==='eventform'){EVENT.name=$('#e-name').value;EVENT.edition=$('#e-ed').value;EVENT.dateLabel=$('#e-date').value;EVENT.time=$('#e-time').value;EVENT.place=$('#e-place').value;EVENT.city=$('#e-city').value;EVENT.about=$('#e-about').value;toast('Evento atualizado');go('inicio')}
+});
+function checkCode(raw){
+  const code=String(raw).trim().toUpperCase(); if(!code)return;
+  const t=validTickets().find(x=>x.code===code);
+  if(!t)S.scan={kind:'none',code};
+  else if(t.used)S.scan={kind:'used',t};
+  else{t.used=true;t.usedAt=new Date();S.scan={kind:'ok',t}}
+  render();
+}
+document.addEventListener('mouseover',e=>{
+  const tip=$('#tip'); if(!tip)return;
+  const r=e.target.closest('[data-tip]'); if(!r){tip.hidden=true;return}
+  const svg=r.ownerSVGElement, box=svg.getBoundingClientRect(), wrap=$('#chart'), wb=wrap.getBoundingClientRect(), sx=box.width/svg.viewBox.baseVal.width;
+  const [d,n,v]=r.dataset.tip.split('|');
+  tip.innerHTML=`<b>${d}</b> · ${n} ingresso${n==='1'?'':'s'}<br>${v}`;
+  tip.style.left=(box.left-wb.left+wrap.scrollLeft+Number(r.dataset.cx)*sx)+'px';
+  tip.style.top=(box.top-wb.top+Number(r.dataset.cy)*sx)+'px';
+  tip.hidden=false;
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&CO){CO=null;renderCO()}});
+render();
+})();
+</script>
